@@ -59,7 +59,6 @@ module DNSimple
           when DNS::CNAME then
             puts "CNAME record: #{r.host} -> #{r.domainname} (ttl: #{r.ttl})"
             DNSimple::Record.create(domain, host_name(r.host, domain.name), 'CNAME', clean_name(r.domainname), :ttl => r.ttl)
-            puts "CNAME record created"
           when DNS::NS then
             if host_name(r.host, domain.name).blank?
               puts "Skip NS record for SLD: #{r.host} -> #{r.domainname}"
