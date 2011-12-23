@@ -29,7 +29,6 @@ module DNSimple
           begin
             import_record(domain, r) 
           rescue => e
-            debugger
             puts "Error importing #{r.host}: #{e.message}"
           end
         end
