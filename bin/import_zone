@@ -5,13 +5,23 @@ $:.unshift('lib')
 
 options = {}
 
-ARGV.options do |opt|
-  opt.on('-t', "--type=[val]", String, "The type of zone file (either bind or tinydns)", "Default: bind") do |type|
+ARGV.options do |opts|
+  opts.on('-t', "--type=[val]", String, "The type of zone file (either bind or tinydns)", "Default: bind") do |type|
     options[:type] = type
   end
+  opts.on('-d', "--debug", "Turn on debugging") do
+    options[:debug] = true
+  end
+  opts.parse!
 end
 
 options[:type] ||= 'bind'
+
+if options[:debug]
+  require 'ruby-debug'
+  require 'dnsimple/client'
+  DNSimple::Client.debug = true
+end
 
 case options[:type]
 when 'bind' then
