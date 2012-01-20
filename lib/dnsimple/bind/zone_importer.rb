@@ -5,6 +5,11 @@ DNSimple::Client.load_credentials
 module DNSimple
   module Bind
     class ZoneImporter
+
+      attr_accessor :dryrun
+
+      alias :dryrun? :dryrun
+        
       def import(f, name=nil)
         puts "importing from '#{f}'"
         name = extract_name(File.basename(f)) unless name 
@@ -12,22 +17,25 @@ module DNSimple
       end
 
       def import_from_string(s, name=nil)
-        DNSimple::Domain.debug_output $stdout
+        #DNSimple::Domain.debug_output $stdout
         
         zone = DNS::Zonefile.load(s, name)
         puts "origin: #{name}"
 
-        domain = nil
-        begin
-          domain = DNSimple::Domain.find(name)
-        rescue => e
-          domain = DNSimple::Domain.create(name) 
+        unless dryrun?
+          domain = nil
+          begin
+            domain = DNSimple::Domain.find(name)
+          rescue => e
+            domain = DNSimple::Domain.create(name) 
+          end
+          puts "domain name: #{domain.name}"
         end
-        puts "domain name: #{domain.name}"
 
         zone.records.each do |r|
           begin
-            import_record(domain, r) 
+            puts "importing #{r.inspect}"
+            import_record(domain, r) unless dryrun?
           rescue => e
             puts "Error importing #{r.host}: #{e.message}"
           end
